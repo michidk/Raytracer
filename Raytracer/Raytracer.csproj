@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -54,6 +55,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Buffer.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Material.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="RaycastHit.cs" />
+    <Compile Include="Renderable.cs" />
+    <Compile Include="CustomMath\Point2D.cs" />
+    <Compile Include="CustomMath\Size2D.cs" />
+    <Compile Include="CustomMath\Vector3D.cs" />
+    <Compile Include="RenderEngine.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="Sphere.cs" />
+    <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

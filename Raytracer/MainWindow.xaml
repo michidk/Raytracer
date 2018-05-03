@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Raytracer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Raytracer" Height="450" Width="800">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" x:Name="UpdateButton" Content="Update" Height="30" Width="180" Click="UpdateButton_Click" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <Viewbox Grid.Row="1" x:Name="Viewbox" StretchDirection="Both" Stretch="Fill">
+            <Image x:Name="RenderOutput" />
+        </Viewbox>
     </Grid>
 </Window>

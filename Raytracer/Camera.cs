@@ -9,68 +9,102 @@ namespace Raytracer
 {
     public class Camera
     {
-        public Vector3D Position;
+        public Vector3D Position { get; private set; }
+        public Vector3D LookAt { get; private set; }
+        public Vector3D Upwards { get; private set; }
 
-        public double VerticalFov;
-        public double AspectRatio;
-        public double Aperture;
-        public double FocusDistance;
+        public double VerticalFov { get; private set; }
+        public double AspectRatio { get; private set; }
+        public double Aperture { get; private set; }
+        public double FocusDistance { get; private set; }
 
-        public double MinPlane;
-        public double MaxPlane;
-        public double MaxDepth;
+        public double MinPlane { get; private set; }
+        public double MaxPlane { get; private set; }
+        public double MaxDepth { get; private set; }
 
-        public double LensRadius;
-        public Vector3D U, V, W;    // transformed vectors: u horizontally, v is pointing upwards from camera matrix, w is the camera directionv
-        public Vector3D LowerLeftCorner;
-        public Vector3D Horizontal;
-        public Vector3D Vertical;
+        public double LensRadius { get; private set; }
+
+        // transformed vectors: u horizontally, v is pointing upwards from camera matrix, w is the camera directionv
+        public Vector3D U { get; private set; }
+        public Vector3D V { get; private set; }     // TODO: really necessary? or just store direction and positon?
+        public Vector3D W { get; private set; }   
+        
+        public Vector3D LowerLeftCorner { get; private set; }
+        public Vector3D Horizontal { get; private set; }
+        public Vector3D Vertical { get; private set; }
 
 
-        public Camera(Vector3D position, Vector3D direction, Vector3D upwards, double verticalFov = 60.0, double aspectRatio = 1.0, double aperture = 0.1d, double focusDistance = 3.0, float minPlane = 0.001f, float maxPlane = 10e7f, float maxDepth = 10f)
+        public Camera(Vector3D position, Vector3D lookAt, Vector3D upwards, double verticalFov = 60.0, double aperture = 0.1d, double focusDistance = 3.0, float minPlane = 0.001f, float maxPlane = 10e7f, float maxDepth = 10f)
         {
             Position = position;
+            LookAt = lookAt;
+            Upwards = upwards;
             VerticalFov = verticalFov;
-            AspectRatio = aspectRatio;
             Aperture = aperture;
             FocusDistance = focusDistance;
             MinPlane = minPlane;
             MaxPlane = maxPlane;
             MaxDepth = maxDepth;
 
-            LensRadius = CalculateLensRadiusFromFocusDistance(focusDistance);
-            CalculateCameraPropertiesFromConstructor(this, direction, upwards, out U, out V, out W, out LowerLeftCorner, out Horizontal, out Vertical);
+            CalculateLensRadius(focusDistance);
+            //CalculateCameraPropertiesFromConstructor(lookAt, upwards); done via Resize
+        }
+
+        public void Resize(double aspectRatio)
+        {
+            if (Math.Abs(AspectRatio - aspectRatio) > 0.00001)  // recalculate only if necessary
+            {
+                AspectRatio = aspectRatio;
+                CalculateCameraPropertiesFromConstructor(LookAt, Upwards);
+            }
         }
 
         public Ray GetRay(Random random, double horizontal, double vertical)
         {
+            if (AspectRatio == 0)
+            {
+                throw new ArgumentException("Camera was not initialized or aspect-ratio was set to 0.");
+            }
+
             Vector3D rand = LensRadius * random.RandomInsideUnitDisk();
             Vector3D offset = U * rand.X + V * rand.Y;
             Vector3D origin = Position + offset;
             Vector3D dir = LowerLeftCorner + horizontal * Horizontal + vertical * Vertical - origin;
             return new Ray(origin, dir.Normalize());
         }
-
-        public static double CalculateLensRadiusFromFocusDistance(double focusDistance)
+        public Ray GetRayNotRandom(double horizontal, double vertical)
         {
-            return focusDistance / 2.0;
+            if (AspectRatio == 0)
+            {
+                throw new ArgumentException("Camera was not initialized or aspect-ratio was set to 0.");
+            }
+
+            Vector3D offset = U * LensRadius + V * LensRadius;
+            Vector3D origin = Position + offset;
+            Vector3D dir = LowerLeftCorner + horizontal * Horizontal + vertical * Vertical - origin;
+            return new Ray(origin, dir.Normalize());
         }
 
-        public static void CalculateCameraPropertiesFromConstructor(Camera cam, Vector3D dir, Vector3D up, out Vector3D u, out Vector3D v, out Vector3D w, out Vector3D lowerLeftCorner, out Vector3D horizontal, out Vector3D vertical)
+        public void CalculateLensRadius(double focusDistance)
         {
-            double theta = cam.VerticalFov * Math.PI / 180.0;
+            LensRadius = focusDistance / 2.0;
+        }
+
+        public void CalculateCameraPropertiesFromConstructor(Vector3D dir, Vector3D up)
+        {
+            double theta = VerticalFov * Math.PI / 180.0;
             double halfHeight = Math.Tan(theta / 2.0);
-            double halfWidth = cam.AspectRatio * halfHeight;
+            double halfWidth = AspectRatio * halfHeight;
 
-            w = dir.Normalize();
-            u = up.Cross(w).Normalize();
-            v = w.Cross(u); // no need to normalize, since crossing two normalized vectors results in a normalized vector
+            W = (Position - dir).Normalize();
+            U = up.Cross(W).Normalize();
+            V = W.Cross(U); // no need to normalize, since crossing two normalized vectors results in a normalized vector
 
-            Vector3D halfHorz = u * halfWidth * cam.FocusDistance;
-            Vector3D halfVert = v * halfHeight * cam.FocusDistance;
-            horizontal = halfHorz * 2;
-            vertical = halfVert * 2;
-            lowerLeftCorner = cam.Position - halfHorz - halfVert - w * cam.FocusDistance;
+            Vector3D halfHorz = U * halfWidth * FocusDistance;
+            Vector3D halfVert = V * halfHeight * FocusDistance;
+            Horizontal = halfHorz * 2;
+            Vertical = halfVert * 2;
+            LowerLeftCorner = Position - halfHorz - halfVert - W * FocusDistance;
         }
 
     }

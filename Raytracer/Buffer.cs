@@ -60,9 +60,9 @@ namespace Raytracer
         public void CopyTo(ref Buffer newBuffer)
         {
             var newSize = newBuffer.Size;
-            for (int x = 0; x < System.Math.Min(Size.Width, newSize.Width); x++)
+            for (int x = 0; x < Math.Min(Size.Width, newSize.Width); x++)
             {
-                for (int y = 0; y < System.Math.Min(Size.Height, newSize.Height); y++)
+                for (int y = 0; y < Math.Min(Size.Height, newSize.Height); y++)
                 {
                     var p = new Point2D(x, y);
                     newBuffer.SetPixel(p, GetPixel(p));

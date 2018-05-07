@@ -37,7 +37,6 @@ namespace Raytracer
                 GenerateImage();
             };
 
-
             raytracer = new RenderEngine(Scene.BuildExampleScene());
         }
 

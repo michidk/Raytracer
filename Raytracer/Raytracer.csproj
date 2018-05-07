@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="Buffer.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="HPColor.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Material.cs" />

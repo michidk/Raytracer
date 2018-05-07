@@ -14,6 +14,7 @@ namespace Raytracer
         }
 
         // reference: https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/raycast.pdf
+        // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
         public override RaycastHit HitObject(Ray ray, double nearPlane, double farPlane)
         {
             Vector3D dist = Position - ray.Origin;                  // distance between sphere center and ray origin

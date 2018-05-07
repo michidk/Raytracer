@@ -14,10 +14,10 @@ namespace Raytracer
         public MaterialType Type;
         public Vector3D Albedo;
         public Vector3D Emissive;
-        public float Roughness;
-        public float Ri;
+        public double Roughness;
+        public double Ri;
 
-        public Material(MaterialType type, Vector3D albedo, Vector3D emissive, float roughness, float ri)
+        public Material(MaterialType type, Vector3D albedo, Vector3D emissive, double roughness, double ri)
         {
             Type = type;
             Albedo = albedo;

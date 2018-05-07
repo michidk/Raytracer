@@ -8,6 +8,9 @@ namespace Raytracer
 {
     public struct Color : IEquatable<Color>
     {
+
+        public const byte MAX = 255;
+
         public byte Red;
         public byte Green;
         public byte Blue;
@@ -18,7 +21,6 @@ namespace Raytracer
             Green = green;
             Blue = blue;
         }
-
         
         public bool Equals(Color other)
         {
@@ -62,12 +64,12 @@ namespace Raytracer
             return new Color((byte) (value1.Red - value2.Red), (byte) (value1.Green - value2.Green), (byte) (value1.Blue - value2.Blue));
         }
 
-        public static Color operator *(Color value1, float value2)
+        public static Color operator *(Color value1, double value2)
         {
             return new Color((byte) (value1.Red * value2), (byte) (value1.Green * value2), (byte) (value1.Blue * value2));
         }
 
-        public static Color operator /(Color value1, float value2)
+        public static Color operator /(Color value1, double value2)
         {
             return new Color((byte) (value1.Red / value2), (byte) (value1.Green / value2), (byte) (value1.Blue / value2));
         }
@@ -75,6 +77,11 @@ namespace Raytracer
         public static Color FromSysColor(System.Drawing.Color color)
         {
             return new Color(color.R, color.G, color.B);
+        }
+
+        public static Color FromHPColor(HPColor color)
+        {
+            return new Color((byte) (color.Red * MAX), (byte) (color.Green * MAX), (byte) (color.Blue * MAX));
         }
 
     }

@@ -17,6 +17,8 @@ namespace Raytracer.CustomMath
         public static readonly Vector3D DOWN = -UP;
         public static readonly Vector3D RIGHT = X_AXIS;
         public static readonly Vector3D LEFT = -LEFT;
+        public static readonly Vector3D FORWARD = Z_AXIS;
+        public static readonly Vector3D BACKWARD = -FORWARD;
 
         public double X;
         public double Y;
@@ -56,6 +58,9 @@ namespace Raytracer.CustomMath
         public Vector3D Normalize()
         {
             var length = Length();
+            if (length == 0)
+                return ZERO;
+
             return new Vector3D(X / length, Y / length, Z / length);
         }
 

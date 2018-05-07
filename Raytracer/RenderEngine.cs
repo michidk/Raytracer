@@ -8,13 +8,25 @@ namespace Raytracer
     public class RenderEngine
     {
 
+        private const int SAMPLES_PER_PIXEL = 1;
+
+        private Scene scene;
+
+        private Random random = new Random();
         private Buffer buffer = new Buffer(new Size2D(0, 0));
 
+        public RenderEngine(Scene scene)
+        {
+            this.scene = scene;
+        }
 
         public BitmapSource Render(Size2D size)
         {
             //buffer.Clear(Color.FromSysColor(System.Drawing.Color.AliceBlue));
             buffer.Resize(size);
+
+            double invWidth = 1.0f / size.Width;
+            double invHeight = 1.0f / size.Height;
 
             for (int x = 0; x < size.Width; x++)
             {
@@ -24,22 +36,28 @@ namespace Raytracer
 
                     // clear color
                     Color color = Color.FromSysColor(System.Drawing.Color.AliceBlue);
-                    float samplesPerPixel = 1;
-                    for (int i = 0; i < 5; i++)
+                    
+                    for (int i = 0; i < SAMPLES_PER_PIXEL; i++)
                     {
-                        Color sample = Color.FromSysColor(System.Drawing.Color.Red);
+                        double u = (x + random.NextDouble()) * invWidth;
+                        double v = (y + random.NextDouble()) * invHeight;
+
                         // trace ray
-                        color += sample / samplesPerPixel;
+                        Ray ray = scene.Camera.GetRay(random, u, v);
+                        color += Trace(ray) / SAMPLES_PER_PIXEL;
                     }
 
-                    //gamma correct
-                    // float3(sqrtf(col.x), sqrtf(col.y), sqrtf(col.z));
-                    color.Red = (byte) System.Math.Sqrt(color.Red);
-                    color.Green = (byte) System.Math.Sqrt(color.Green);
-                    color.Blue = (byte) System.Math.Sqrt(color.Blue);
+                    // correct gamma and convert to bytes
+                    //color.Red = (byte) Math.Sqrt(color.Red);
+                    //color.Green = (byte) Math.Sqrt(color.Green);
+                    //color.Blue = (byte) Math.Sqrt(color.Blue);
+
+                    // lerp with previous color
+                    //var prevCol = buffer.GetPixel(pos);
+                    //color = prevCol * lerpFactor + color * (1 - lerpFactor);
+
                     buffer.SetPixel(pos, color);
                     //buffer.SetPixel(pos, new Color((byte) (x % 255), (byte) (y % 255), (byte) (x % 255)));
-
                 }
 
             }
@@ -47,19 +65,38 @@ namespace Raytracer
             return Utils.GetBitmapSourceFromArray(buffer.RawData, size);
         }
 
-        private Color Trace()
+        private Color Trace(Ray ray)
         {
-            return new Color(0x0b, 0x0b, 0x0b);
+            RaycastHit hit = HitWorld(ray);
+
+            if (hit.Hit)    // render object
+            {
+                return Color.FromSysColor(System.Drawing.Color.Green);
+            }
+            else            // render sky
+            {
+                return Color.FromSysColor(System.Drawing.Color.Red);
+            }
         }
 
-        private bool HitWorld(Scene scene)
+        private RaycastHit HitWorld(Ray ray)
         {
-            foreach (var renderable in scene)
+            var cam = scene.Camera;
+
+            RaycastHit lastHit = new RaycastHit {Hit = false};
+            double closest = cam.MaxPlane;
+
+            foreach (var renderable in scene.Renderables)
             {
-                renderable.
+                RaycastHit hit = renderable.HitObject(ray, cam.MinPlane, closest);
+
+                if (hit.Hit)
+                {
+                    lastHit = hit;
+                }
             }
 
-            return false;
+            return lastHit;
         }
 
     }

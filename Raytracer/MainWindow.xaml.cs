@@ -38,7 +38,7 @@ namespace Raytracer
             };
 
 
-            raytracer = new RenderEngine();
+            raytracer = new RenderEngine(Scene.BuildExampleScene());
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

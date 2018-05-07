@@ -14,7 +14,7 @@ namespace Raytracer
         }
 
         // reference: https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/raycast.pdf
-        public override RaycastHit HitObject(Ray ray)
+        public override RaycastHit HitObject(Ray ray, double nearPlane, double farPlane)
         {
             Vector3D dist = Position - ray.Origin;                  // distance between sphere center and ray origin
             double proj = dist.Dot(ray.Direction);                  // length of (project distance vector onto direction) 
@@ -32,8 +32,8 @@ namespace Raytracer
 
             double t1 = proj - innerT;                              // distance from ray origin to first hit on sphere
             double t2 = proj + innerT;                              // distance from ray origin to second hit on sphere
-            bool t1Hit = t1 < ray.FarPlane && t1 > ray.NearPlane;
-            bool t2Hit = t2 < ray.FarPlane && t2 > ray.NearPlane;
+            bool t1Hit = t1 > nearPlane && t1 < farPlane;
+            bool t2Hit = t2 > nearPlane && t2 < farPlane;
 
             if (t1Hit || t2Hit)
             {

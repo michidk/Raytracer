@@ -33,10 +33,5 @@ namespace Raytracer
             return wbm;
         }
 
-        public static int Clamp(int value, int min, int max)
-        {
-            return System.Math.Min(max, System.Math.Max(value, min));
-        }
-
     }
 }

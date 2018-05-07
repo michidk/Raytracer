@@ -14,7 +14,7 @@ namespace Raytracer
             Material = material;
         }
 
-        public abstract RaycastHit HitObject(Ray ray);
+        public abstract RaycastHit HitObject(Ray ray, double nearPlane, double farPlane);
 
     }
 }

@@ -11,8 +11,12 @@ namespace Raytracer
     {
         public Vector3D Origin;
         public Vector3D Direction;
-        public double NearPlane;
-        public double FarPlane;
+
+        public Ray(Vector3D origin, Vector3D direction)
+        {
+            Origin = origin;
+            Direction = direction;
+        }
 
         public Vector3D PointAt(double distance)
         {

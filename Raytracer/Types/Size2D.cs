@@ -23,6 +23,16 @@ namespace Raytracer.Types
             Height = Convert.ToInt32(heigt);
         }
 
+        public static bool operator ==(Size2D value1, Size2D value2)
+        {
+            return value1.Equals(value2);
+        }
+
+        public static bool operator !=(Size2D value1, Size2D value2)
+        {
+            return !value1.Equals(value2);
+        }
+
         public bool Equals(Size2D other)
         {
             return Width == other.Width && Height == other.Height;
@@ -42,14 +52,5 @@ namespace Raytracer.Types
             }
         }
 
-        public static bool operator ==(Size2D value1, Size2D value2)
-        {
-            return value1.Equals(value2);
-        }
-
-        public static bool operator !=(Size2D value1, Size2D value2)
-        {
-            return !value1.Equals(value2);
-        }
     }
 }

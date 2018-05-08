@@ -31,6 +31,11 @@ namespace Raytracer.Types
             Z = z;
         }
 
+        public Vector3D Hadamard(Vector3D other)
+        {
+            return new Vector3D(X * other.X, Y * other.Y, Z * other.Z);
+        }
+
         public double Dot(Vector3D other)
         {
             return X * other.X + Y * other.Y + Z * other.Z;
@@ -62,28 +67,6 @@ namespace Raytracer.Types
                 return Zero;
 
             return new Vector3D(X / length, Y / length, Z / length);
-        }
-
-        public bool Equals(Vector3D other)
-        {
-            return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is Vector3D && Equals((Vector3D) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = X.GetHashCode();
-                hashCode = (hashCode * 397) ^ Y.GetHashCode();
-                hashCode = (hashCode * 397) ^ Z.GetHashCode();
-                return hashCode;
-            }
         }
 
         public static bool operator ==(Vector3D value1, Vector3D value2)
@@ -134,6 +117,28 @@ namespace Raytracer.Types
         public static Vector3D operator /(double value1, Vector3D value2)
         {
             return new Vector3D(value1 / value2.X, value1 / value2.Y, value1 / value2.Z);
+        }
+
+        public bool Equals(Vector3D other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is Vector3D && Equals((Vector3D) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = X.GetHashCode();
+                hashCode = (hashCode * 397) ^ Y.GetHashCode();
+                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

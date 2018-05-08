@@ -10,8 +10,8 @@ namespace Raytracer
     public class RenderEngine
     {
         private const int SAMPLES_PER_PIXEL = 1;
-        private readonly Buffer buffer = new Buffer(Size2D.Zero);
 
+        private readonly Buffer buffer = new Buffer(Size2D.Zero);
         private readonly Random random = new Random();
 
         public RenderEngine(Scene scene)
@@ -27,10 +27,10 @@ namespace Raytracer
         {
             //buffer.Clear(Color.FromSysColor(System.Drawing.Color.AliceBlue));
             buffer.Resize(size);
-            Scene.Camera.UpdateViewport(size.Width / (double) size.Height);
+            Scene.Camera.UpdateViewport(size);
 
-            double invWidth = 1.0f / size.Width;
-            double invHeight = 1.0f / size.Height;
+            //double invWidth = 1.0f / size.Width;
+            //double invHeight = 1.0f / size.Height;
 
             for (var x = 0; x < size.Width; x++)
             for (var y = 0; y < size.Height; y++)
@@ -42,11 +42,11 @@ namespace Raytracer
 
                 for (var i = 0; i < SAMPLES_PER_PIXEL; i++)
                 {
-                    var u = (x + random.NextDouble()) * invWidth;
-                    var v = (y + random.NextDouble()) * invHeight;
+                    //var u = (x + random.NextDouble()) * invWidth;
+                    //var v = (y + random.NextDouble()) * invHeight;
 
                     // trace ray
-                    var ray = Scene.Camera.GetRay(u, v); //TODO: use random
+                    var ray = Scene.Camera.GetRay(x, y); //TODO: use random
                     var col = Trace(ray);
                     color += col / SAMPLES_PER_PIXEL;
                 }
@@ -86,17 +86,23 @@ namespace Raytracer
         {
             var cam = Scene.Camera;
 
-            var lastHit = new RaycastHit {Hit = false};
-            var closest = cam.MaxPlane;
+            var closestHit = new RaycastHit
+            {
+                Hit = false,
+                DistanceToHit = cam.MaxPlane,
+            };
 
             foreach (var renderable in Scene.Renderables)
             {
-                var hit = renderable.HitObject(ray, cam.MinPlane, closest);
+                var hit = renderable.HitObject(ray, cam.MinPlane, closestHit.DistanceToHit);
 
-                if (hit.Hit) lastHit = hit;
+                if (hit.Hit && hit.DistanceToHit <= closestHit.DistanceToHit)  // second check not really necessary because we already pass it as new far plane to HitObject(..)
+                {
+                    closestHit = hit;
+                }
             }
 
-            return lastHit;
+            return closestHit;
         }
     }
 }

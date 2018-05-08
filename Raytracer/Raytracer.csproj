@@ -61,9 +61,11 @@
     <Compile Include="Extensions\RandomExtensions.cs" />
     <Compile Include="Types\HPColor.cs" />
     <Compile Include="Types\Color.cs" />
+    <Compile Include="Types\Matrix4x4.cs" />
     <Compile Include="Types\Point2D.cs" />
     <Compile Include="Types\Size2D.cs" />
     <Compile Include="Types\Vector3D.cs" />
+    <Compile Include="Utils\DoubleUtils.cs" />
     <Compile Include="Utils\VectorUtils.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="Ray.cs" />

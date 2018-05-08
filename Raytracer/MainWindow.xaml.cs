@@ -37,26 +37,26 @@ namespace Raytracer
             double stepSize = 0.3;
             var cam = raytracer.Scene.Camera;
 
-            var vec = cam.Position;
+            var pos = cam.Position;
             switch (e.Key)
             {
                 case Key.W:
-                    vec.Z += stepSize;
+                    pos.Z += stepSize;
                     break;
                 case Key.S:
-                    vec.Z -= stepSize;
+                    pos.Z -= stepSize;
                     break;
                 case Key.D:
-                    vec.X += stepSize;
+                    pos.X += stepSize;
                     break;
                 case Key.A:
-                    vec.X -= stepSize;
+                    pos.X -= stepSize;
                     break;
             }
 
-            if (cam.Position != vec)
+            if (cam.Position != pos)
             {
-                cam.UpdatePosition(vec);
+                cam.RecalculateMatrix(pos, pos + Vector3D.Forward);
                 GenerateImage();
             }
             

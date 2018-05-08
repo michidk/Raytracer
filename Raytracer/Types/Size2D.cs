@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Raytracer.CustomMath
+namespace Raytracer.Types
 {
     public struct Size2D : IEquatable<Size2D>
     {
-
         public static Size2D Zero = new Size2D(0, 0);
 
         public int Width;
@@ -22,6 +17,12 @@ namespace Raytracer.CustomMath
             Height = height;
         }
 
+        public Size2D(double width, double heigt)
+        {
+            Width = Convert.ToInt32(width);
+            Height = Convert.ToInt32(heigt);
+        }
+
         public bool Equals(Size2D other)
         {
             return Width == other.Width && Height == other.Height;
@@ -32,7 +33,7 @@ namespace Raytracer.CustomMath
             if (ReferenceEquals(null, obj)) return false;
             return obj is Size2D && Equals((Size2D) obj);
         }
-        
+
         public override int GetHashCode()
         {
             unchecked
@@ -50,6 +51,5 @@ namespace Raytracer.CustomMath
         {
             return !value1.Equals(value2);
         }
-
     }
 }

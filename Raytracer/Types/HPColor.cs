@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Raytracer
+namespace Raytracer.Types
 {
     // high precision HPColor used for calculations during rendering
     public struct HPColor : IEquatable<HPColor>

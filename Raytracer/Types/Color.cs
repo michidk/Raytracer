@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Raytracer
+namespace Raytracer.Types
 {
     public struct Color : IEquatable<Color>
     {
-
         public const byte MAX = 255;
 
         public byte Red;
@@ -21,7 +16,7 @@ namespace Raytracer
             Green = green;
             Blue = blue;
         }
-        
+
         public bool Equals(Color other)
         {
             return Red == other.Red && Green == other.Green && Blue == other.Blue;
@@ -56,22 +51,26 @@ namespace Raytracer
 
         public static Color operator +(Color value1, Color value2)
         {
-            return new Color((byte) (value1.Red + value2.Red), (byte) (value1.Green + value2.Green), (byte) (value1.Blue + value2.Blue));
+            return new Color((byte) (value1.Red + value2.Red), (byte) (value1.Green + value2.Green),
+                (byte) (value1.Blue + value2.Blue));
         }
 
         public static Color operator -(Color value1, Color value2)
         {
-            return new Color((byte) (value1.Red - value2.Red), (byte) (value1.Green - value2.Green), (byte) (value1.Blue - value2.Blue));
+            return new Color((byte) (value1.Red - value2.Red), (byte) (value1.Green - value2.Green),
+                (byte) (value1.Blue - value2.Blue));
         }
 
         public static Color operator *(Color value1, double value2)
         {
-            return new Color((byte) (value1.Red * value2), (byte) (value1.Green * value2), (byte) (value1.Blue * value2));
+            return new Color((byte) (value1.Red * value2), (byte) (value1.Green * value2),
+                (byte) (value1.Blue * value2));
         }
 
         public static Color operator /(Color value1, double value2)
         {
-            return new Color((byte) (value1.Red / value2), (byte) (value1.Green / value2), (byte) (value1.Blue / value2));
+            return new Color((byte) (value1.Red / value2), (byte) (value1.Green / value2),
+                (byte) (value1.Blue / value2));
         }
 
         public static Color FromSysColor(System.Drawing.Color color)
@@ -83,6 +82,5 @@ namespace Raytracer
         {
             return new Color((byte) (color.Red * MAX), (byte) (color.Green * MAX), (byte) (color.Blue * MAX));
         }
-
     }
 }

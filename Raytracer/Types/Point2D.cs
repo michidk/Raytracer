@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Raytracer.CustomMath
+namespace Raytracer.Types
 {
     public struct Point2D : IEquatable<Point2D>
     {
-
         public int X;
         public int Y;
 
@@ -17,7 +12,7 @@ namespace Raytracer.CustomMath
             X = x;
             Y = y;
         }
-        
+
         public bool Equals(Point2D other)
         {
             return X == other.X && Y == other.Y;
@@ -46,6 +41,5 @@ namespace Raytracer.CustomMath
         {
             return !value1.Equals(value2);
         }
-
     }
 }

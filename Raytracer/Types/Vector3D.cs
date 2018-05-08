@@ -1,25 +1,25 @@
 ﻿using static System.Math;
 
-namespace Raytracer.CustomMath
+namespace Raytracer.Types
 {
     public struct Vector3D
     {
-        
         // basic vectors
-        public static readonly Vector3D ZERO = new Vector3D(0, 0, 0);
-        public static readonly Vector3D ONE = new Vector3D(1, 1, 1);
-        public static readonly Vector3D X_AXIS = new Vector3D(1, 0, 0);
-        public static readonly Vector3D Y_AXIS = new Vector3D(0, 1, 0);
-        public static readonly Vector3D Z_AXIS = new Vector3D(0, 0, 1);
-        
-        // directional vectors
-        public static readonly Vector3D UP = Y_AXIS;
-        public static readonly Vector3D DOWN = -UP;
-        public static readonly Vector3D RIGHT = X_AXIS;
-        public static readonly Vector3D LEFT = -LEFT;
-        public static readonly Vector3D FORWARD = Z_AXIS;
-        public static readonly Vector3D BACKWARD = -FORWARD;
+        public static readonly Vector3D Zero = new Vector3D(0, 0, 0);
+        public static readonly Vector3D One = new Vector3D(1, 1, 1);
+        public static readonly Vector3D XAxis = new Vector3D(1, 0, 0);
+        public static readonly Vector3D YAxis = new Vector3D(0, 1, 0);
+        public static readonly Vector3D ZAxis = new Vector3D(0, 0, 1);
 
+        // directional vectors
+        public static readonly Vector3D Up = YAxis;
+        public static readonly Vector3D Down = -Up;
+        public static readonly Vector3D Right = XAxis;
+        public static readonly Vector3D Left = -Right;
+        public static readonly Vector3D Forward = ZAxis;
+        public static readonly Vector3D Backward = -Forward;
+
+        // members
         public double X;
         public double Y;
         public double Z;
@@ -39,10 +39,10 @@ namespace Raytracer.CustomMath
         public Vector3D Cross(Vector3D other)
         {
             return new Vector3D(
-                this.Y * other.Z - this.Z * other.Y,
-                this.Z * other.X - this.X * other.Z,
-                this.X * other.Y - this.Y * other.X
-                );
+                Y * other.Z - Z * other.Y,
+                Z * other.X - X * other.Z,
+                X * other.Y - Y * other.X
+            );
         }
 
         public double LengthSquared()
@@ -59,7 +59,7 @@ namespace Raytracer.CustomMath
         {
             var length = Length();
             if (length == 0)
-                return ZERO;
+                return Zero;
 
             return new Vector3D(X / length, Y / length, Z / length);
         }
@@ -135,6 +135,5 @@ namespace Raytracer.CustomMath
         {
             return new Vector3D(value1 / value2.X, value1 / value2.Y, value1 / value2.Z);
         }
-
     }
 }

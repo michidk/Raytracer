@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -55,22 +56,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Buffer.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="HPColor.cs" />
-    <Compile Include="Color.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Types\Buffer.cs" />
+    <Compile Include="SceneGraph\Camera.cs" />
+    <Compile Include="Extensions\RandomExtensions.cs" />
+    <Compile Include="Types\HPColor.cs" />
+    <Compile Include="Types\Color.cs" />
+    <Compile Include="Types\Point2D.cs" />
+    <Compile Include="Types\Size2D.cs" />
+    <Compile Include="Types\Vector3D.cs" />
+    <Compile Include="Utils\VectorUtils.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="RaycastHit.cs" />
-    <Compile Include="Renderable.cs" />
-    <Compile Include="CustomMath\Point2D.cs" />
-    <Compile Include="CustomMath\Size2D.cs" />
-    <Compile Include="CustomMath\Vector3D.cs" />
+    <Compile Include="SceneGraph\Renderable.cs" />
     <Compile Include="RenderEngine.cs" />
-    <Compile Include="Scene.cs" />
-    <Compile Include="Sphere.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="SceneGraph\Scene.cs" />
+    <Compile Include="SceneGraph\Sphere.cs" />
+    <Compile Include="Utils\BitmapUtils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Raytracer.CustomMath;
+﻿using Raytracer.Types;
 
 namespace Raytracer
 {
     public class Ray
     {
-        public Vector3D Origin;
         public Vector3D Direction;
+        public Vector3D Origin;
 
         public Ray(Vector3D origin, Vector3D direction)
         {

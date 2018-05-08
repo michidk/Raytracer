@@ -1,12 +1,11 @@
-﻿using Raytracer.CustomMath;
-
+﻿using Raytracer.Types;
 
 namespace Raytracer
 {
     public abstract class Renderable
     {
-        public Vector3D Position;
         public Material Material;
+        public Vector3D Position;
 
         protected Renderable(Vector3D position, Material material)
         {
@@ -15,6 +14,5 @@ namespace Raytracer
         }
 
         public abstract RaycastHit HitObject(Ray ray, double nearPlane, double farPlane);
-
     }
 }

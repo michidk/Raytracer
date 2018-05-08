@@ -47,7 +47,7 @@ namespace Raytracer.CustomMath
 
         public double LengthSquared()
         {
-            return Pow(X, 2) + Pow(Y, 2) + Pow(Z, 2);
+            return Dot(this); //Pow(X, 2) + Pow(Y, 2) + Pow(Z, 2);
         }
 
         public double Length()

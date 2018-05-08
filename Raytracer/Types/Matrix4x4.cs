@@ -7,6 +7,7 @@ namespace Raytracer.Types
         public const int Rows = 4;
         public const int Columns = 4;
 
+        // Myx | Mrowcolumn
         public double M11, M12, M13, M14;
         public double M21, M22, M23, M24;
         public double M31, M32, M33, M34;
@@ -128,6 +129,17 @@ namespace Raytracer.Types
 
         public static Vector3D operator *(Matrix4x4 mat, Vector3D vec)
         {
+            double a = vec.X * mat.M11 + vec.Y * mat.M12 + vec.Z * mat.M13 + mat.M14;
+            double b = vec.X * mat.M21 + vec.Y * mat.M22 + vec.Z * mat.M23 + mat.M24;
+            double c = vec.X * mat.M31 + vec.Y * mat.M32 + vec.Z * mat.M33 + mat.M34;
+            double w = vec.X * mat.M41 + vec.Y * mat.M42 + vec.Z * mat.M43 + mat.M44;
+
+            return new Vector3D(a / w, b / w, c / w);
+        }
+
+        /*
+        public static Vector3D operator *(Vector3D vec, Matrix4x4 mat)
+        {
             double a = vec.X * mat.M11 + vec.Y * mat.M21 + vec.Z * mat.M31 + mat.M41;
             double b = vec.X * mat.M12 + vec.Y * mat.M22 + vec.Z * mat.M32 + mat.M42;
             double c = vec.X * mat.M13 + vec.Y * mat.M23 + vec.Z * mat.M33 + mat.M43;
@@ -135,6 +147,7 @@ namespace Raytracer.Types
 
             return new Vector3D(a / w, b / w, c / w);
         }
+        */
         
         public bool Equals(Matrix4x4 other)
         {

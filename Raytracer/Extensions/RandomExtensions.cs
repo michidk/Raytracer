@@ -16,8 +16,8 @@ namespace Raytracer.Extensions
             Vector3D point;
             do
             {
-                point = 2 * new Vector3D(random.NextDouble(), random.NextDouble(), 0) - dir;
-            } while (point.Dot(point) >= 1);
+                point = 2.0 * new Vector3D(random.NextDouble(), random.NextDouble(), 0) - dir;
+            } while (point.LengthSquared() >= 1);
 
             return point;
         }

@@ -135,7 +135,7 @@ namespace Raytracer
             Vector3D dir = CameraToWorldMatrix.MultiplyDirection(new Vector3D(u, v, 1)).Normalize();
 
             Vector3D rd = lensRadius * random.RandomInsideUnitDisk();
-            Vector3D offset = CameraToWorldMatrix.MultiplyDirection(Vector3D.Up) *rd.X + CameraToWorldMatrix.MultiplyDirection(Vector3D.Right) * rd.Y; // ad rd.x in right direction and rd.y in up direction
+            Vector3D offset = CameraToWorldMatrix.MultiplyDirection(Vector3D.Up) * rd.X + CameraToWorldMatrix.MultiplyDirection(Vector3D.Right) * rd.Y; // ad rd.x in right direction and rd.y in up direction
 
             return new Ray(position + offset, dir);
         }

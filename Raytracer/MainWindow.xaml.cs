@@ -1,55 +1,79 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows.Interop;
 using Raytracer.Types;
 using Raytracer.Utils;
 using Buffer = Raytracer.Types.Buffer;
 
-
 namespace Raytracer
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const bool AUTO_START_RENDERING = true;
+        private const bool USE_BACKGROUND_WORKER = true;
 
-        private RenderEngine raytracer;
+
+        private const int WM_EXIT_SIZE_MOVE = 0x232;
+        private readonly BackgroundWorker bw;
+
+        private readonly RenderEngine raytracer;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            this.Loaded += OnLoaded;
+            Loaded += OnLoaded;
 
             raytracer = new RenderEngine(Scene.BuildExampleScene());
+            bw = new BackgroundWorker();
+            bw.WorkerReportsProgress = true;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            // subscribe to sized event after finishing loading (otherwise we will get lots of 0,0 calls)
-            this.SizeChanged += OnSizeChanged;
-
             // Image has to be initialized with a minimal bitmap to correctly calculate dimensions
             RenderOutput.Source = BitmapUtils.CreateEmptyBitmap();
             UpdateLayout();
 
-            GenerateImage();
+            if (AUTO_START_RENDERING)
+                GenerateImage();
 
             // now listen to key presses
-            this.KeyDown += MainWindow_KeyDown;
+            KeyDown += OnKeyDown;
+
+            // add hook to subscribe to hwn message events
+            var helper = new WindowInteropHelper(this);
+            var source = HwndSource.FromHwnd(helper.Handle);
+            source?.AddHook(HwndMessageHook);
         }
 
-        private void OnSizeChanged(object sender, RoutedEventArgs e)
+        private void OnUpdateButtonPressed(object sender, RoutedEventArgs e)
         {
             GenerateImage();
         }
 
-        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        private IntPtr HwndMessageHook(IntPtr wnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            double stepSize = 0.5;
+            switch (msg)
+            {
+                case WM_EXIT_SIZE_MOVE:
+                    GenerateImage();
+                    handled = true;
+                    break;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            var stepSize = 0.5;
             var cam = raytracer.Scene.Camera;
 
             var pos = cam.Position;
@@ -74,7 +98,6 @@ namespace Raytracer
                 cam.SetPositionAndDirection(pos, -pos);
                 GenerateImage();
             }
-            
         }
 
         private void GenerateImage()
@@ -83,8 +106,36 @@ namespace Raytracer
             if (size == Size2D.Zero)
                 return;
 
-            RenderOutput.Source = raytracer.Render(size);
-        }
+            if (bw.IsBusy)
+                return;
 
+            ProgressBar.Value = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            if (!USE_BACKGROUND_WORKER)
+            {
+                RenderOutput.Source = BitmapUtils.GetBitmapSourceFromArray(raytracer.Render(size).RawData, size);
+                stopwatch.Stop();
+                Console.WriteLine($@"Time: {stopwatch.ElapsedMilliseconds}ms, Ticks: {stopwatch.ElapsedTicks}");
+            }
+            else
+            {
+                bw.DoWork += raytracer.RenderAsync;
+
+                bw.ProgressChanged += (sender, args) => { ProgressBar.Value = args.ProgressPercentage; };
+                bw.RunWorkerCompleted += (sender, args) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        RenderOutput.Source = BitmapUtils.GetBitmapSourceFromArray(((Buffer)args.Result).RawData, size);
+                        stopwatch.Stop();
+                        Console.WriteLine($@"Time: {stopwatch.ElapsedMilliseconds}ms, Ticks: {stopwatch.ElapsedTicks}");
+                    });
+                };
+                bw.RunWorkerAsync(size);
+            }
+
+        }
     }
 }

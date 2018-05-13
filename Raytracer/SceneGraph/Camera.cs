@@ -7,7 +7,7 @@ namespace Raytracer
 {
     public class Camera
     {
-        public Camera(double verticalFov = 60.0, float minPlane = 0.001f, float maxPlane = 10e7f)
+        public Camera(double verticalFov = 90.0, float minPlane = 0.001f, float maxPlane = 10e7f)
         {
             CameraToWorldMatrix = Matrix4x4.CreateIdentity();
             VerticalFov = verticalFov;
@@ -26,7 +26,7 @@ namespace Raytracer
 
         public Vector3D Position
         {
-            get { return CameraToWorldMatrix * Vector3D.Zero; }
+            get { return CameraToWorldMatrix.MultiplyPosition(Vector3D.Zero); }
         }
 
         public void UpdateViewport(Size2D screenSize)
@@ -48,14 +48,14 @@ namespace Raytracer
         public Ray GetRay(double horizontal, double vertical)
         {
             // --- TODO: move outside and calculate only once
-            Vector3D origin = CameraToWorldMatrix * Vector3D.Zero;
+            Vector3D origin = CameraToWorldMatrix.MultiplyPosition(Vector3D.Zero);
             double scale = Math.Tan(DoubleUtils.DegreesToRadians(VerticalFov * 0.5));
             //
 
             double x = (2 * (horizontal + 0.5) / (double) ScreenSize.Width - 1) * AspectRatio * scale;
             double y = (1 - 2 * (vertical + 0.5) / (double) ScreenSize.Height) * scale;
 
-            var dir = (CameraToWorldMatrix * new Vector3D(x, y, -1)).Normalize();
+            var dir = (CameraToWorldMatrix.MultiplyDirection(new Vector3D(x, y, 1))).Normalize();
 
             return new Ray(origin, dir);
         }

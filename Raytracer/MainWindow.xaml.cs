@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Raytracer.Types;
+using Raytracer.Utils;
+using Buffer = Raytracer.Types.Buffer;
 
 
 namespace Raytracer
@@ -18,23 +22,34 @@ namespace Raytracer
         {
             InitializeComponent();
 
-            this.Loaded += GenerateImage_Event;
-            this.SizeChanged += GenerateImage_Event;
-
-
-            this.KeyDown += MainWindow_KeyDown;
+            this.Loaded += OnLoaded;
 
             raytracer = new RenderEngine(Scene.BuildExampleScene());
         }
 
-        private void GenerateImage_Event(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // subscribe to sized event after finishing loading (otherwise we will get lots of 0,0 calls)
+            this.SizeChanged += OnSizeChanged;
+
+            // Image has to be initialized with a minimal bitmap to correctly calculate dimensions
+            RenderOutput.Source = BitmapUtils.CreateEmptyBitmap();
+            UpdateLayout();
+
+            GenerateImage();
+
+            // now listen to key presses
+            this.KeyDown += MainWindow_KeyDown;
+        }
+
+        private void OnSizeChanged(object sender, RoutedEventArgs e)
         {
             GenerateImage();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            double stepSize = 0.3;
+            double stepSize = 0.5;
             var cam = raytracer.Scene.Camera;
 
             var pos = cam.Position;
@@ -64,13 +79,11 @@ namespace Raytracer
 
         private void GenerateImage()
         {
-            var size = new Size2D(Viewbox.ActualWidth, Viewbox.ActualHeight);
+            var size = new Size2D(RenderOutput.ActualWidth, RenderOutput.ActualHeight);
             if (size == Size2D.Zero)
-                    size = new Size2D(1, 1);
+                return;
 
-            var renderOutput = raytracer.Render(size);
-
-            RenderOutput.Source = renderOutput;
+            RenderOutput.Source = raytracer.Render(size);
         }
 
     }

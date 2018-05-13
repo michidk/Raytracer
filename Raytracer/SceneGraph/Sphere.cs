@@ -39,11 +39,13 @@ namespace Raytracer
             {
                 var t = t1Hit ? t1 : t2;
 
+                var hitPoint = ray.PointAt(t);
                 var hit = new RaycastHit
                 {
                     Hit = true,
                     DistanceToHit = t,
-                    Position = ray.PointAt(t)
+                    Position = hitPoint,
+                    Normal = (hitPoint - this.Position).Normalize()
                 };
 
                 return hit;

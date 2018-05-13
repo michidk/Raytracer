@@ -73,13 +73,17 @@ namespace Raytracer
 
             if (hit.Hit) // render object
             {
-                return HPColor.FromSysColor(Color.Green);
+                var l = -new Vector3D(-1, -1, 1).Normalize();
+                double product = l.Dot(hit.Normal);
+                product = Math.Min(Math.Max(product, 0), 1);
+                return HPColor.FromSysColor(Color.Green) * product;
             }
 
             //return HPColor.FromSysColor(System.Drawing.Color.Red);
             var r = ray.Direction;
             var t = 0.5 * (r.Y + 1);
             return (new HPColor(1, 1, 1) * (1 - t) + new HPColor(0.5, 0.5, 1) * t) * 0.3;
+            return HPColor.FromSysColor(Color.Aqua);
         }
 
         private RaycastHit HitWorld(Ray ray)

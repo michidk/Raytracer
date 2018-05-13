@@ -58,21 +58,21 @@ namespace Raytracer.Types
             result.M11 = 1.0f;
             result.M12 = 0.0f;
             result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M14 = position.X;
 
             result.M21 = 0.0f;
             result.M22 = 1.0f;
             result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M24 = position.Y;
 
             result.M31 = 0.0f;
             result.M32 = 0.0f;
             result.M33 = 1.0f;
-            result.M34 = 0.0f;
+            result.M34 = position.Z;
 
-            result.M41 = position.X;
-            result.M42 = position.Y;
-            result.M43 = position.Z;
+            result.M41 = 0.0f;
+            result.M42 = 0.0f;
+            result.M43 = 0.0f;
             result.M44 = 1.0f;
 
             return result;
@@ -105,37 +105,84 @@ namespace Raytracer.Types
             return result;
         }
 
-        public static Matrix4x4 CreateScale(Vector3D scale, Vector3D center)
-        {
-            Vector3D t = center.Hadamard(Vector3D.One - scale);
-            return CreateScale(t);
-        }
-
-        public static Matrix4x4 CreateLookAt(Vector3D eye, Vector3D center, Vector3D up)
+        public static Matrix4x4 CreateLookAt(Vector3D eye, Vector3D target, Vector3D up)
         {
             up = up.Normalize();    // direction vector -> normalize
 
-            Vector3D forward = (center - eye).Normalize();  // forward vector
-            Vector3D left = up.Cross(forward).Normalize();  // orthogonal vector
-            Vector3D up2 = forward.Cross(left).Normalize(); // force orthogonality for up vector, incase up and forward were not orthogonal
+            Vector3D forward = (target - eye).Normalize();  // forward vector
+            Vector3D right = up.Cross(forward).Normalize();  // orthogonal vector
+            Vector3D up2 = forward.Cross(right).Normalize(); // force orthogonality for up vector, incase up and forward were not orthogonal
 
-            return new Matrix4x4(
-                left.X,      left.Y,      left.Z,       left.Dot(-eye),
+            /*return new Matrix4x4(
+                right.X,      right.Y,      right.Z,       right.Dot(-eye),
                 up2.X,       up2.Y,       up2.Z,        up2.Dot(-eye),
                 -forward.X,  -forward.Y,  -forward.Z,   -forward.Dot(-eye),
                 0,           0,           0,            1
-                );
+                );*/
+            var rot = new Matrix4x4(
+                right.X, up2.X, forward.X, 0,
+                right.Y, up2.Y, forward.Y, 0,
+                right.Z, up2.Z, forward.Z, 0,
+                0, 0, 0, 1
+            );
+
+            return rot * CreateTranslation(eye);
         }
 
-        public static Vector3D operator *(Matrix4x4 mat, Vector3D vec)
+        public static Matrix4x4 operator *(Matrix4x4 l, Matrix4x4 r)
         {
-            double a = vec.X * mat.M11 + vec.Y * mat.M12 + vec.Z * mat.M13 + mat.M14;
-            double b = vec.X * mat.M21 + vec.Y * mat.M22 + vec.Z * mat.M23 + mat.M24;
-            double c = vec.X * mat.M31 + vec.Y * mat.M32 + vec.Z * mat.M33 + mat.M34;
-            double w = vec.X * mat.M41 + vec.Y * mat.M42 + vec.Z * mat.M43 + mat.M44;
+            Matrix4x4 res;
 
-            return new Vector3D(a / w, b / w, c / w);
+            // Row 1
+            res.M11 = l.M11 * r.M11 + l.M12 * r.M21 + l.M13 * r.M31 + l.M14 * r.M41;  // Column 1
+            res.M12 = l.M11 * r.M12 + l.M12 * r.M22 + l.M13 * r.M32 + l.M14 * r.M42;  // Column 2
+            res.M13 = l.M11 * r.M13 + l.M12 * r.M23 + l.M13 * r.M33 + l.M14 * r.M43;  // Column 3
+            res.M14 = l.M11 * r.M14 + l.M12 * r.M24 + l.M13 * r.M34 + l.M14 * r.M44;  // Column 4
+
+            // Row 2
+            res.M21 = l.M21 * r.M11 + l.M22 * r.M21 + l.M23 * r.M31 + l.M24 * r.M41;  // Column 1
+            res.M22 = l.M21 * r.M12 + l.M22 * r.M22 + l.M23 * r.M32 + l.M24 * r.M42;  // Column 2
+            res.M23 = l.M21 * r.M13 + l.M22 * r.M23 + l.M23 * r.M33 + l.M24 * r.M43;  // Column 3
+            res.M24 = l.M21 * r.M14 + l.M22 * r.M24 + l.M23 * r.M34 + l.M24 * r.M44;  // Column 4
+
+            // Row 3
+            res.M31 = l.M31 * r.M11 + l.M32 * r.M21 + l.M33 * r.M31 + l.M34 * r.M41;  // Column 1
+            res.M32 = l.M31 * r.M12 + l.M32 * r.M22 + l.M33 * r.M32 + l.M34 * r.M42;  // Column 2
+            res.M33 = l.M31 * r.M13 + l.M32 * r.M23 + l.M33 * r.M33 + l.M34 * r.M43;  // Column 3
+            res.M34 = l.M31 * r.M14 + l.M32 * r.M24 + l.M33 * r.M34 + l.M34 * r.M44;  // Column 4
+
+            // Row 4
+            res.M41 = l.M41 * r.M11 + l.M42 * r.M21 + l.M43 * r.M31 + l.M44 * r.M41;  // Column 1
+            res.M42 = l.M41 * r.M12 + l.M42 * r.M22 + l.M43 * r.M32 + l.M44 * r.M42;  // Column 2
+            res.M43 = l.M41 * r.M13 + l.M42 * r.M23 + l.M43 * r.M33 + l.M44 * r.M43;  // Column 3
+            res.M44 = l.M41 * r.M14 + l.M42 * r.M24 + l.M43 * r.M34 + l.M44 * r.M44;  // Column 4
+
+            return res;
         }
+
+        //public static Vector3D operator *(Matrix4x4 mat, Vector3D vec)
+        public Vector3D MultiplyPosition(Vector3D vec)
+        {
+            double a = vec.X * M11 + vec.Y * M12 + vec.Z * M13 + M14;
+            double b = vec.X * M21 + vec.Y * M22 + vec.Z * M23 + M24;
+            double c = vec.X * M31 + vec.Y * M32 + vec.Z * M33 + M34;
+            //double w = vec.X * mat.M41 + vec.Y * mat.M42 + vec.Z * mat.M43 + mat.M44;
+
+            //return new Vector3D(a / w, b / w, c / w);
+            return new Vector3D(a, b, c);
+        }
+
+        public Vector3D MultiplyDirection(Vector3D vec)
+        {
+            double a = vec.X * M11 + vec.Y * M12 + vec.Z * M13;
+            double b = vec.X * M21 + vec.Y * M22 + vec.Z * M23;
+            double c = vec.X * M31 + vec.Y * M32 + vec.Z * M33;
+            //double w = vec.X * mat.M41 + vec.Y * mat.M42 + vec.Z * mat.M43 + mat.M44;
+
+            //return new Vector3D(a / w, b / w, c / w);
+            return new Vector3D(a, b, c);
+        }
+
 
         /*
         public static Vector3D operator *(Vector3D vec, Matrix4x4 mat)
@@ -148,7 +195,7 @@ namespace Raytracer.Types
             return new Vector3D(a / w, b / w, c / w);
         }
         */
-        
+
         public bool Equals(Matrix4x4 other)
         {
             return M11.Equals(other.M11) && M12.Equals(other.M12) && M13.Equals(other.M13) && M14.Equals(other.M14) && M21.Equals(other.M21) && M22.Equals(other.M22) && M23.Equals(other.M23) && M24.Equals(other.M24) && M31.Equals(other.M31) && M32.Equals(other.M32) && M33.Equals(other.M33) && M34.Equals(other.M34) && M41.Equals(other.M41) && M42.Equals(other.M42) && M43.Equals(other.M43) && M44.Equals(other.M44);

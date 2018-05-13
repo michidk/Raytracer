@@ -10,6 +10,7 @@ namespace Raytracer.Utils
 {
     public static class BitmapUtils
     {
+
         public static BitmapSource GetBitmapSourceFromBitmap(Bitmap bitmap)
         {
             return Imaging.CreateBitmapSourceFromHBitmap(
@@ -24,10 +25,16 @@ namespace Raytracer.Utils
             var format = PixelFormats.Rgb24;
 
             var wbm = new WriteableBitmap(size.Width, size.Height, 96, 96, format, null);
-            wbm.WritePixels(new Int32Rect(0, 0, size.Width, size.Height), data, format.BitsPerPixel / 8 * size.Width,
-                0);
+            wbm.WritePixels(new Int32Rect(0, 0, size.Width, size.Height), data, format.BitsPerPixel / 8 * size.Width, 0);
 
             return wbm;
         }
+
+        // creates the most minimal bitmapsource that can be created
+        public static BitmapSource CreateEmptyBitmap()
+        {
+            return BitmapSource.Create(1, 1, 1, 1, PixelFormats.BlackWhite, null, new byte[] {0}, 1);
+        }
+
     }
 }

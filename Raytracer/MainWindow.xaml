@@ -11,9 +11,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" x:Name="UpdateButton" Content="Update" Height="30" Width="180" Click="GenerateImage_Event" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-        <Viewbox Grid.Row="1" x:Name="Viewbox" StretchDirection="Both" Stretch="Fill">
-            <Image x:Name="RenderOutput" />
-        </Viewbox>
+        <Button Grid.Row="0" x:Name="UpdateButton" Content="Update" Height="30" Width="180" Click="OnSizeChanged" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <Image Grid.Row="1" x:Name="RenderOutput" Stretch="Fill" />
     </Grid>
 </Window>

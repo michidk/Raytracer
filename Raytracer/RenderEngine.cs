@@ -10,6 +10,7 @@ namespace Raytracer
     public class RenderEngine
     {
         private const int SAMPLES_PER_PIXEL = 1;
+        private const bool USE_RANDOM_RAYS = false;
 
         private readonly Buffer buffer = new Buffer(Size2D.Zero);
         private readonly Random random = new Random();
@@ -25,29 +26,27 @@ namespace Raytracer
 
         public BitmapSource Render(Size2D size)
         {
-            //buffer.Clear(Color.FromSysColor(System.Drawing.Color.AliceBlue));
             buffer.Resize(size);
-            Scene.Camera.UpdateViewport(size);
-
-            //double invWidth = 1.0f / size.Width;
-            //double invHeight = 1.0f / size.Height;
+            Scene.Camera.ScreenSize = size;
 
             for (var x = 0; x < size.Width; x++)
             for (var y = 0; y < size.Height; y++)
             {
                 var pos = new Point2D(x, y);
 
-                // clear color
-                var color = HPColor.FromSysColor(Color.Black);
+                // starting color, has to be 0,0,0
+                var color = new HPColor(0, 0, 0);
 
                 for (var i = 0; i < SAMPLES_PER_PIXEL; i++)
                 {
-                    //var u = (x + random.NextDouble()) * invWidth;
-                    //var v = (y + random.NextDouble()) * invHeight;
-
                     // trace ray
-                    var ray = Scene.Camera.GetRay(x, y); //TODO: use random
-                    var col = Trace(ray);
+                    Ray ray;
+                    if (USE_RANDOM_RAYS)
+                        ray = Scene.Camera.GetRandomizedRay(x, y, random);
+                    else
+                        ray = Scene.Camera.GetRay(x, y);
+
+                    HPColor col = Trace(ray);
                     color += col / SAMPLES_PER_PIXEL;
                 }
 
@@ -61,7 +60,6 @@ namespace Raytracer
                 //color = prevCol * lerpFactor + color * (1 - lerpFactor);
 
                 buffer.SetPixel(pos, Types.Color.FromHPColor(color));
-                //buffer.SetPixel(pos, new Color((byte) (x % 255), (byte) (y % 255), (byte) (x % 255)));
             }
 
             return BitmapUtils.GetBitmapSourceFromArray(buffer.RawData, size);
@@ -78,12 +76,12 @@ namespace Raytracer
                 product = Math.Min(Math.Max(product, 0), 1);
                 return HPColor.FromSysColor(Color.Green) * product;
             }
-
-            //return HPColor.FromSysColor(System.Drawing.Color.Red);
-            var r = ray.Direction;
-            var t = 0.5 * (r.Y + 1);
-            return (new HPColor(1, 1, 1) * (1 - t) + new HPColor(0.5, 0.5, 1) * t) * 0.3;
-            return HPColor.FromSysColor(Color.Aqua);
+            else
+            {
+                var r = ray.Direction;
+                var t = 0.5 * (r.Y + 1);
+                return (new HPColor(1, 1, 1) * (1 - t) + new HPColor(0.5, 0.5, 1) * t) * 0.3;
+            }
         }
 
         private RaycastHit HitWorld(Ray ray)

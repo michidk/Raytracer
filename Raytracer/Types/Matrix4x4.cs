@@ -105,28 +105,30 @@ namespace Raytracer.Types
             return result;
         }
 
-        public static Matrix4x4 CreateLookAt(Vector3D eye, Vector3D target, Vector3D up)
+        public static Matrix4x4 CreateFromDirection(Vector3D direction, Vector3D up)
         {
-            up = up.Normalize();    // direction vector -> normalize
+            up = up.Normalize();                                // direction vector -> normalize
 
-            Vector3D forward = (target - eye).Normalize();  // forward vector
-            Vector3D right = up.Cross(forward).Normalize();  // orthogonal vector
-            Vector3D up2 = forward.Cross(right).Normalize(); // force orthogonality for up vector, incase up and forward were not orthogonal
+            Vector3D forward = direction.Normalize();           // forward vector
+            Vector3D right = up.Cross(forward).Normalize();     // orthogonal vector
+            Vector3D up2 = forward.Cross(right).Normalize();    // force orthogonality for up vector, incase up and forward were not orthogonal
 
-            /*return new Matrix4x4(
-                right.X,      right.Y,      right.Z,       right.Dot(-eye),
-                up2.X,       up2.Y,       up2.Z,        up2.Dot(-eye),
-                -forward.X,  -forward.Y,  -forward.Z,   -forward.Dot(-eye),
-                0,           0,           0,            1
-                );*/
-            var rot = new Matrix4x4(
+            return new Matrix4x4(
                 right.X, up2.X, forward.X, 0,
                 right.Y, up2.Y, forward.Y, 0,
                 right.Z, up2.Z, forward.Z, 0,
                 0, 0, 0, 1
-            );
+                );
+        }
 
-            return rot * CreateTranslation(eye);
+        public static Matrix4x4 CreateLookAt(Vector3D eye, Vector3D target, Vector3D up)
+        {
+            return CreateFromDirection((target - eye), up) * CreateTranslation(eye);
+        }
+
+        public static Matrix4x4 CreateTRS(Vector3D origin, Vector3D direction, Vector3D scale)
+        {
+            return CreateScale(scale) * CreateFromDirection(direction, Vector3D.Up) * CreateTranslation(origin);
         }
 
         public static Matrix4x4 operator *(Matrix4x4 l, Matrix4x4 r)

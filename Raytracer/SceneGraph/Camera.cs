@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using Raytracer.Extensions;
 using Raytracer.Types;
 using Raytracer.Utils;
 
@@ -7,72 +8,152 @@ namespace Raytracer
 {
     public class Camera
     {
-        public Camera(double verticalFov = 90.0, float minPlane = 0.001f, float maxPlane = 10e7f)
+        public Camera(Vector3D position, Vector3D direction, double verticalFov = 90.0, float minPlane = 0.001f, float maxPlane = 10e7f, double aperture = 0.1)
         {
-            CameraToWorldMatrix = Matrix4x4.CreateIdentity();
+            SetPositionAndDirection(position, direction);
+
             VerticalFov = verticalFov;
             MinPlane = minPlane;
             MaxPlane = maxPlane;
+            Aperture = aperture;
         }
 
-        public Matrix4x4 CameraToWorldMatrix { get; private set; }
-
-        public double VerticalFov { get; }
-        public double AspectRatio { get; private set; }
-        public Size2D ScreenSize { get; private set; }
-
-        public double MinPlane { get; }
-        public double MaxPlane { get; }
-
+        #region Positon, Direction and View-Matrix
+        private Vector3D position;
         public Vector3D Position
         {
-            get { return CameraToWorldMatrix.MultiplyPosition(Vector3D.Zero); }
-        }
-
-        public void UpdateViewport(Size2D screenSize)
-        {
-            double aspectRatio = screenSize.Width / (double) screenSize.Height;
-
-            if (Math.Abs(AspectRatio - aspectRatio) > 0.00001) // recalculate only if necessary, because this is set every frame
+            get => position;
+            set
             {
-                ScreenSize = screenSize;
-                AspectRatio = aspectRatio;
+                position = value;
+                CameraToWorldMatrix = CalculateCameraToWorldMatrix(position, direction);
             }
         }
 
-        public void RecalculateMatrix(Vector3D position, Vector3D lookAt)
+        private Vector3D direction;
+        public Vector3D Direction
         {
-            CameraToWorldMatrix = Matrix4x4.CreateLookAt(position, lookAt, Vector3D.Up);
+            get => direction;
+            set
+            {
+                direction = value;
+                CameraToWorldMatrix = CalculateCameraToWorldMatrix(position, direction);
+            }
         }
 
-        public Ray GetRay(double horizontal, double vertical)
+        public Matrix4x4 CameraToWorldMatrix { get; private set; }
+        #endregion
+
+        #region Fov and Scale
+        private double verticalFov;
+        public double VerticalFov
         {
-            // --- TODO: move outside and calculate only once
-            Vector3D origin = CameraToWorldMatrix.MultiplyPosition(Vector3D.Zero);
-            double scale = Math.Tan(DoubleUtils.DegreesToRadians(VerticalFov * 0.5));
-            //
+            get => verticalFov;
+            set
+            {
+                verticalFov = value;
+                Scale = CalculateScaleFromVerticalFov(verticalFov);
+            }
+        }
+        
+        public double Scale { get; private set; }
+        #endregion
 
-            double x = (2 * (horizontal + 0.5) / (double) ScreenSize.Width - 1) * AspectRatio * scale;
-            double y = (1 - 2 * (vertical + 0.5) / (double) ScreenSize.Height) * scale;
+        #region ScreenSize and Aspect Ratio
 
-            var dir = (CameraToWorldMatrix.MultiplyDirection(new Vector3D(x, y, 1))).Normalize();
+        private Size2D screenSize;
 
-            return new Ray(origin, dir);
+        public Size2D ScreenSize
+        {
+            get => screenSize;
+            set
+            {
+                screenSize = value;
+                AspectRatio = CalculateAspectRationFromScreenSize(screenSize);
+            }
         }
 
-        public Ray GetRayRandomized(Random random, double horizontal, double vertical)
+        public double AspectRatio { get; private set; }
+        #endregion
+
+        #region Frustum
+        public double MinPlane { get; set; }
+        public double MaxPlane { get; set; }
+        #endregion
+
+        #region Aperture and Lens Radius
+        private double aperture;
+
+        public double Aperture
         {
-            /* TODO: implement later
-            var rand = LensRadius * random.RandomInsideUnitDisk();
-            var offset = U * rand.X + V * rand.Y;
-            var origin = Position + offset;
-            var dir = LowerLeftCorner + horizontal * Horizontal + vertical * Vertical - origin;
-            return new Ray(origin, dir.Normalize());
-            */
-            return new Ray(Vector3D.Zero, Vector3D.Zero);
+            get => aperture;
+            set
+            {
+                aperture = value;
+                lensRadius = aperture * 2.0;
+            }
         }
 
+        private double lensRadius;
 
+        public double LensRadius
+        {
+            get => lensRadius;
+            set
+            {
+                lensRadius = value;
+                aperture = lensRadius / 2.0;
+            }
+        }
+        #endregion
+
+        public void SetPositionAndDirection(Vector3D position, Vector3D direction)
+        {
+            this.position = position;
+            this.direction = direction.Normalize();
+            this.CameraToWorldMatrix = CalculateCameraToWorldMatrix(this.position, this.direction);
+        }
+
+        public Ray GetRay(double x, double y)
+        {
+            double u = (2 * (x + 0.5) / (double) ScreenSize.Width - 1) * AspectRatio * Scale;
+            double v = (1 - 2 * (y + 0.5) / (double) ScreenSize.Height) * Scale;
+
+            var dir = CameraToWorldMatrix.MultiplyDirection(new Vector3D(u, v, 1)).Normalize();
+
+            return new Ray(position, dir);
+        }
+
+        public Ray GetRandomizedRay(double x, double y, Random random)
+        {
+            x += random.NextDouble();
+            y += random.NextDouble();
+
+            double u = (2 * (x + 0.5) / (double) ScreenSize.Width - 1) * AspectRatio * Scale;
+            double v = (1 - 2 * (y + 0.5) / (double) ScreenSize.Height) * Scale;
+
+            Vector3D dir = CameraToWorldMatrix.MultiplyDirection(new Vector3D(u, v, 1)).Normalize();
+
+            Vector3D rd = lensRadius * random.RandomInsideUnitDisk();
+            Vector3D offset = CameraToWorldMatrix.MultiplyDirection(Vector3D.Up) *rd.X + CameraToWorldMatrix.MultiplyDirection(Vector3D.Right) * rd.Y; // ad rd.x in right direction and rd.y in up direction
+
+            return new Ray(position + offset, dir);
+        }
+
+        private static double CalculateAspectRationFromScreenSize(Size2D screenSize)
+        {
+            return screenSize.Width / (double)screenSize.Height;
+        }
+
+        private static double CalculateScaleFromVerticalFov(double fov)
+        {
+            return Math.Tan(DoubleUtils.DegreesToRadians(fov * 0.5));
+        }
+
+        private static Matrix4x4 CalculateCameraToWorldMatrix(Vector3D position, Vector3D direction)
+        {
+            return Matrix4x4.CreateTRS(position, direction, Vector3D.One);
+        }
 
     }
 }

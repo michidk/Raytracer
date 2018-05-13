@@ -71,7 +71,7 @@ namespace Raytracer
 
             if (cam.Position != pos)
             {
-                cam.RecalculateMatrix(pos, pos + Vector3D.Forward);
+                cam.SetPositionAndDirection(pos, -pos);
                 GenerateImage();
             }
             

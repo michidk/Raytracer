@@ -66,7 +66,7 @@
     <Compile Include="Types\Size2D.cs" />
     <Compile Include="Types\Vector3D.cs" />
     <Compile Include="Utils\DoubleUtils.cs" />
-    <Compile Include="Utils\VectorUtils.cs" />
+    <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="RaycastHit.cs" />

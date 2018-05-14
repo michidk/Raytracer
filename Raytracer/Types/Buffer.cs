@@ -4,40 +4,35 @@ namespace Raytracer.Types
 {
     public class Buffer
     {
-        public const int COLOR_STRIDE = 3;
-
-        private byte[] data;
-        private Color lastClearColor;
-
         public Size2D Size;
 
+        public Color[,] RawData => data;
+        private Color[,] data;
 
         public Buffer(Size2D size)
         {
             Size = size;
-
-            data = new byte[size.Area * COLOR_STRIDE];
+            data = new Color[size.Width, size.Height];
         }
 
-        public ref byte[] RawData => ref data;
-
-        public int GetIndex(Point2D pixel)
+        public void SetPixel(int x, int y, Color color)
         {
-            return (pixel.X + pixel.Y * Size.Width) * COLOR_STRIDE;
+            data[x, y] = color;
         }
 
         public void SetPixel(Point2D pixel, Color color)
         {
-            var idx = GetIndex(pixel);
-            data[idx] = color.Red;
-            data[++idx] = color.Green;
-            data[++idx] = color.Blue;
+            SetPixel(pixel.X, pixel.Y, color);
+        }
+
+        public Color GetPixel(int x, int y)
+        {
+            return data[x, y];
         }
 
         public Color GetPixel(Point2D pixel)
         {
-            var idx = GetIndex(pixel);
-            return new Color(data[idx], data[++idx], data[++idx]);
+            return GetPixel(pixel.X, pixel.Y);
         }
 
         public void Clear(Color color)
@@ -45,11 +40,8 @@ namespace Raytracer.Types
             for (var x = 0; x < Size.Width; x++)
             for (var y = 0; y < Size.Height; y++)
             {
-                var p = new Point2D(x, y);
-                SetPixel(p, color);
+                data[x, y] = color;
             }
-
-            lastClearColor = color;
         }
 
         public void CopyTo(ref Buffer newBuffer)
@@ -58,8 +50,7 @@ namespace Raytracer.Types
             for (var x = 0; x < Math.Min(Size.Width, newSize.Width); x++)
             for (var y = 0; y < Math.Min(Size.Height, newSize.Height); y++)
             {
-                var p = new Point2D(x, y);
-                newBuffer.SetPixel(p, GetPixel(p));
+                newBuffer.data[x, y] = data[x, y];
             }
         }
 
@@ -68,24 +59,14 @@ namespace Raytracer.Types
             if (Size == newSize)
                 return;
 
-            var newData = new byte[newSize.Area * COLOR_STRIDE];
+            var newData = new Color[newSize.Width, newSize.Height];
 
             for (var x = 0; x < newSize.Width; x++)
             for (var y = 0; y < newSize.Height; y++)
             {
-                var idx = (x + y * newSize.Width) * COLOR_STRIDE;
                 if (x < Size.Width && y < Size.Height)
                 {
-                    var oldIdx = (x + y * Size.Width) * COLOR_STRIDE;
-                    newData[idx] = data[oldIdx];
-                    newData[idx + 1] = data[oldIdx + 1];
-                    newData[idx + 2] = data[oldIdx + 2];
-                }
-                else
-                {
-                    newData[idx] = lastClearColor.Red;
-                    newData[idx + 1] = lastClearColor.Green;
-                    newData[idx + 2] = lastClearColor.Blue;
+                    newData[x, y] = data[x, y];
                 }
             }
 

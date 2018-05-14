@@ -59,7 +59,6 @@
     <Compile Include="Types\Buffer.cs" />
     <Compile Include="SceneGraph\Camera.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
-    <Compile Include="Types\HPColor.cs" />
     <Compile Include="Types\Color.cs" />
     <Compile Include="Types\Matrix4x4.cs" />
     <Compile Include="Types\Point2D.cs" />

@@ -11,14 +11,14 @@ namespace Raytracer
             Dialectric
         }
 
-        public Vector3D Albedo;
-        public Vector3D Emissive;
+        public Color Albedo;
+        public Color Emissive;
         public double Ri;
         public double Roughness;
 
         public MaterialType Type;
 
-        public Material(MaterialType type, Vector3D albedo, Vector3D emissive, double roughness, double ri)
+        public Material(MaterialType type, Color albedo, Color emissive, double roughness, double ri)
         {
             Type = type;
             Albedo = albedo;

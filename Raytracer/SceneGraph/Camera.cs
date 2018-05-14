@@ -8,7 +8,7 @@ namespace Raytracer
 {
     public class Camera
     {
-        public Camera(Vector3D position, Vector3D direction, double verticalFov = 90.0, float minPlane = 0.001f, float maxPlane = 10e7f, double aperture = 0.1)
+        public Camera(Vector3D position, Vector3D direction, double verticalFov = 60.0, float minPlane = 0.001f, float maxPlane = 10e7f, double aperture = 0.1)
         {
             SetPositionAndDirection(position, direction);
 
@@ -90,7 +90,7 @@ namespace Raytracer
             set
             {
                 aperture = value;
-                lensRadius = aperture * 2.0;
+                lensRadius = aperture / 2.0;
             }
         }
 
@@ -102,7 +102,7 @@ namespace Raytracer
             set
             {
                 lensRadius = value;
-                aperture = lensRadius / 2.0;
+                aperture = lensRadius * 2.0;
             }
         }
         #endregion
@@ -126,11 +126,8 @@ namespace Raytracer
 
         public Ray GetRandomizedRay(double x, double y, Random random)
         {
-            x += random.NextDouble();
-            y += random.NextDouble();
-
-            double u = (2 * (x + 0.5) / (double) ScreenSize.Width - 1) * AspectRatio * Scale;
-            double v = (1 - 2 * (y + 0.5) / (double) ScreenSize.Height) * Scale;
+            double u = (2 * (x + random.NextDouble()) / (double) ScreenSize.Width - 1) * AspectRatio * Scale;
+            double v = (1 - 2 * (y + random.NextDouble()) / (double) ScreenSize.Height) * Scale;
 
             Vector3D dir = CameraToWorldMatrix.MultiplyDirection(new Vector3D(u, v, 1)).Normalize();
 

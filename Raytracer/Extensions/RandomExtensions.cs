@@ -10,6 +10,9 @@ namespace Raytracer.Extensions
             return (float) random.NextDouble();
         }
 
+        // you shouldn't make a loop condition dependet on randomness -> worst case: runs forever
+        // but there is no other way to generate equally distributed points on a circle without the square-root
+        // also in most cases the loop will only run only once, sometimes twice but nearly never more than three times
         public static Vector3D RandomInsideUnitDisk(this Random random)
         {
             var dir = new Vector3D(1, 1, 0);

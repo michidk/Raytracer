@@ -109,6 +109,11 @@ namespace Raytracer.Types
             return value2 * value1;
         }
 
+        public static Vector3D operator *(Vector3D value1, Vector3D value2)
+        {
+            return value1.Hadamard(value2);
+        }
+
         public static Vector3D operator /(Vector3D value1, double value2)
         {
             return new Vector3D(value1.X / value2, value1.Y / value2, value1.Z / value2);

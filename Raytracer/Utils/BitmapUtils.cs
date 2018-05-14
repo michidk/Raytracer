@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Raytracer.Types;
+using Buffer = Raytracer.Types.Buffer;
 
 namespace Raytracer.Utils
 {
@@ -30,11 +32,34 @@ namespace Raytracer.Utils
             return wbm;
         }
 
+        public static BitmapSource GetBitmapSourceFromBuffer(Buffer data)
+        {
+            var size = data.Size;
+            var format = PixelFormats.Rgb128Float;  // floating point format, which automaticlly does gamma correction
+
+            float[] array = new float[size.Width * size.Height * 4];
+            int c = 0;
+            for (int y = 0; y < size.Height; y++)
+            for (int x = 0; x < size.Width; x++)
+            {
+                var color = data.RawData[x, y];
+                array[c++] = (float) color.Red;
+                array[c++] = (float) color.Green;
+                array[c++] = (float) color.Blue;
+                array[c++] = 1;
+            }
+
+            var wbm = new WriteableBitmap(size.Width, size.Height, 96, 96, format, null);
+            wbm.WritePixels(new Int32Rect(0, 0, size.Width, size.Height), array, format.BitsPerPixel / 8 * size.Width, 0);
+
+            return wbm;
+        }
+
         // creates the most minimal bitmapsource that can be created
         public static BitmapSource CreateEmptyBitmap()
         {
             return BitmapSource.Create(1, 1, 1, 1, PixelFormats.BlackWhite, null, new byte[] {0}, 1);
         }
-
+        
     }
 }

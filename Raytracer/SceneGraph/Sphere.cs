@@ -20,13 +20,13 @@ namespace Raytracer
             var proj = dist.Dot(ray.Direction);                 // length of (project distance vector onto direction) 
 
             if (proj < 0)
-                return new RaycastHit();                        // projected vector points to opposite direction and therefor can't hit the sphere
+                return default(RaycastHit);                     // projected vector points to opposite direction and therefor can't hit the sphere
 
             var squaredD = dist.Dot(dist) - Math.Pow(proj, 2);  // squared length from sphere center to hit point on raycast direction (orthogonal to raycast dir)
             var squaredRadius = Math.Pow(Radius, 2);            // squared radius to compare with d
 
             if (squaredD > squaredRadius)                       // hit point on raycast direction outside radius
-                return new RaycastHit();
+                return default(RaycastHit);
 
             var innerT = Math.Sqrt(squaredRadius - squaredD);   // distance from hit point to center projected on raycast dir
 
@@ -43,15 +43,17 @@ namespace Raytracer
                 var hit = new RaycastHit
                 {
                     Hit = true,
-                    DistanceToHit = t,
+                    Ray = ray,
+                    Object = this,
                     Position = hitPoint,
-                    Normal = (hitPoint - this.Position).Normalize()
+                    Normal = (hitPoint - this.Position).Normalize(),
+                    DistanceToHit = t
                 };
 
                 return hit;
             }
 
-            return new RaycastHit();
+            return default(RaycastHit);
         }
     }
 }

@@ -31,8 +31,7 @@ namespace Raytracer
             Loaded += OnLoaded;
 
             raytracer = new RenderEngine(Scene.BuildExampleScene());
-            bw = new BackgroundWorker();
-            bw.WorkerReportsProgress = true;
+            bw = new BackgroundWorker { WorkerReportsProgress = true };
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -115,7 +114,7 @@ namespace Raytracer
             stopwatch.Start();
             if (!USE_BACKGROUND_WORKER)
             {
-                RenderOutput.Source = BitmapUtils.GetBitmapSourceFromArray(raytracer.Render(size).RawData, size);
+                RenderOutput.Source = BitmapUtils.GetBitmapSourceFromBuffer(raytracer.Render(size));
                 stopwatch.Stop();
                 Console.WriteLine($@"Time: {stopwatch.ElapsedMilliseconds}ms, Ticks: {stopwatch.ElapsedTicks}");
             }
@@ -129,7 +128,7 @@ namespace Raytracer
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        RenderOutput.Source = BitmapUtils.GetBitmapSourceFromArray(((Buffer)args.Result).RawData, size);
+                        RenderOutput.Source = BitmapUtils.GetBitmapSourceFromBuffer((Buffer) args.Result);
                         stopwatch.Stop();
                         Console.WriteLine($@"Time: {stopwatch.ElapsedMilliseconds}ms, Ticks: {stopwatch.ElapsedTicks}");
                     });

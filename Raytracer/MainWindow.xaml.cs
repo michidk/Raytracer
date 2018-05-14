@@ -121,6 +121,7 @@ namespace Raytracer
             }
             else
             {
+                bw.DoWork -= raytracer.RenderAsync;
                 bw.DoWork += raytracer.RenderAsync;
 
                 bw.ProgressChanged += (sender, args) => { ProgressBar.Value = args.ProgressPercentage; };

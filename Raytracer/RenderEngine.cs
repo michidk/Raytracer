@@ -11,7 +11,8 @@ namespace Raytracer
     public class RenderEngine
     {
         private const int SAMPLES_PER_PIXEL = 4; // 4
-        private const int FRAME_COUNT = 30; // 30
+        private const int FRAME_COUNT = 1; // 30
+        private const int MAX_TRACE_DEPTH = 10; // 10
         private const bool USE_RANDOM_RAYS = false;
         private const bool USE_THREADS = true;
         
@@ -110,7 +111,7 @@ namespace Raytracer
                     else
                         ray = Scene.Camera.GetRay(x, y);
 
-                    Types.Color col = Trace(ray, random);
+                    Color col = Trace(ray, 0, random);
 
                     // weight color
                     color += col / SAMPLES_PER_PIXEL;
@@ -123,16 +124,15 @@ namespace Raytracer
             }
         }
 
-        private Color Trace(Ray ray, Random random)
+        private Color Trace(Ray ray, int depth, Random random)
         {
             var hit = HitWorld(ray);
 
             if (hit.Hit)
             {
-                if (Scatter(hit, out Ray scattered, out Color attenuation, random)) // reflect new ray from the surface
+                if (depth < MAX_TRACE_DEPTH &&  Scatter(hit, out Ray scattered, out Color attenuation, random)) // reflect new ray from the surface
                 {
-                    
-                    return hit.Object.Material.Emissive + attenuation * Trace(scattered, random);
+                    return hit.Object.Material.Emissive + attenuation * Trace(scattered, ++depth, random);
                 }
                 else // ray is absorbed -> no albedo shown
                 {
@@ -141,12 +141,12 @@ namespace Raytracer
             }
             else // Display Skybox
             {
-                return new Color(0.15f, 0.21f, 0.3f);
+                //return new Color(0.15f, 0.21f, 0.3f);
                 return RenderSkybox(hit);
             }                                
         }
 
-        private Types.Color RenderNDotL(RaycastHit hit)
+        private Color RenderNDotL(RaycastHit hit)
         {
             var l = -new Vector3D(-1, -1, 1).Normalize();
             double product = l.Dot(hit.Normal);
@@ -154,11 +154,11 @@ namespace Raytracer
             return hit.Object.Material.Albedo * product;
         }
 
-        private Types.Color RenderSkybox(RaycastHit hit)
+        private Color RenderSkybox(RaycastHit hit)
         {
             var r = hit.Ray.Direction;
             var t = 0.5 * (r.Y + 1);
-            return (new Types.Color(1, 1, 1) * (1 - t) + new Types.Color(0.5, 0.5, 1) * t) * 0.3;
+            return (new Color(1, 1, 1) * (1 - t) + new Color(0.5, 0.7, 1) * t) * 0.3;
         }
 
         private RaycastHit HitWorld(Ray ray)

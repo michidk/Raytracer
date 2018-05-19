@@ -16,8 +16,11 @@ namespace Raytracer
 
         public static Scene BuildExampleScene()
         {
+            var viewPos = new Vector3D(0, 0, 0);
+            var viewDir = Vector3D.Forward;
+
             var camera = new Camera();
-            camera.RecalculateMatrix(new Vector3D(0, 0, 10), new Vector3D(0, 0, 10) + Vector3D.Forward);
+            camera.RecalculateMatrix(viewPos, viewPos + viewDir);
 
             var scene = new Scene(camera);
 

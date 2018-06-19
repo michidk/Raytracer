@@ -10,10 +10,10 @@ namespace Raytracer
 {
     public class RenderEngine
     {
-        private const int SAMPLES_PER_PIXEL = 4; // 4
+        private const int SAMPLES_PER_PIXEL = 20*20; // 4
         private const int FRAME_COUNT = 1; // 30
         private const int MAX_TRACE_DEPTH = 10; // 10
-        private const bool USE_RANDOM_RAYS = false;
+        private const bool USE_RANDOM_RAYS = true;
         private const bool USE_THREADS = true;
         
         private readonly Random globalRandom = new Random();
@@ -100,7 +100,7 @@ namespace Raytracer
                 var pos = new Point2D(x, y);
 
                 // starting color, has to be 0,0,0
-                var color = new Types.Color(0, 0, 0);
+                var color = new Color(0, 0, 0);
 
                 for (var i = 0; i < SAMPLES_PER_PIXEL; i++)
                 {
@@ -141,17 +141,10 @@ namespace Raytracer
             }
             else // Display Skybox
             {
-                //return new Color(0.15f, 0.21f, 0.3f);
-                return RenderSkybox(hit);
+                //return new Color(0.6f, 0.8f, 1.0f);
+                return new Color(1f, 1f, 1f);
+                //return RenderSkybox(hit);
             }                                
-        }
-
-        private Color RenderNDotL(RaycastHit hit)
-        {
-            var l = -new Vector3D(-1, -1, 1).Normalize();
-            double product = l.Dot(hit.Normal);
-            product = Math.Min(Math.Max(product, 0), 1);
-            return hit.Object.Material.Albedo * product;
         }
 
         private Color RenderSkybox(RaycastHit hit)
@@ -185,7 +178,7 @@ namespace Raytracer
             return closestHit;
         }
 
-        private bool Scatter(RaycastHit hit, out Ray scattered, out Types.Color attenuation, Random random)
+        private bool Scatter(RaycastHit hit, out Ray scattered, out Color attenuation, Random random)
         {
             Material mat = hit.Object.Material;
 
@@ -203,7 +196,7 @@ namespace Raytracer
             }
 
             scattered = default(Ray);
-            attenuation = default(Types.Color);
+            attenuation = default(Color);
             return false;
         }
 

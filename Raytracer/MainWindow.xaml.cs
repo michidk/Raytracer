@@ -17,6 +17,7 @@ namespace Raytracer
     {
         private const bool AUTO_START_RENDERING = true;
         private const bool USE_BACKGROUND_WORKER = true;
+        private const bool RERENDER_ON_MOVE = false;
 
 
         private const int WM_EXIT_SIZE_MOVE = 0x232;
@@ -62,7 +63,8 @@ namespace Raytracer
             switch (msg)
             {
                 case WM_EXIT_SIZE_MOVE:
-                    GenerateImage();
+                    if (RERENDER_ON_MOVE)
+                        GenerateImage();
                     handled = true;
                     break;
             }

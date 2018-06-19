@@ -35,7 +35,7 @@ namespace Raytracer.Utils
         public static BitmapSource GetBitmapSourceFromBuffer(Buffer data)
         {
             var size = data.Size;
-            var format = PixelFormats.Rgb128Float;  // floating point format, which automaticlly does gamma correction
+            var format = PixelFormats.Rgba128Float;  // floating point format, which automaticlly does gamma correction
 
             float[] array = new float[size.Width * size.Height * 4];
             int c = 0;
@@ -43,9 +43,9 @@ namespace Raytracer.Utils
             for (int x = 0; x < size.Width; x++)
             {
                 var color = data.RawData[x, y];
-                array[c++] = (float) color.Red;
-                array[c++] = (float) color.Green;
-                array[c++] = (float) color.Blue;
+                array[c++] = (float) Math.Pow(color.Red, 2.2f);
+                array[c++] = (float) Math.Pow(color.Green, 2.2f);
+                array[c++] = (float) Math.Pow(color.Blue, 2.2f);
                 array[c++] = 1;
             }
 

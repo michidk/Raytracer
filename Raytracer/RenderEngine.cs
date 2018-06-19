@@ -142,8 +142,8 @@ namespace Raytracer
             else // Display Skybox
             {
                 //return new Color(0.6f, 0.8f, 1.0f);
-                return new Color(1f, 1f, 1f);
-                //return RenderSkybox(hit);
+                //return new Color(1f, 1f, 1f);
+                return RenderSkybox(hit);
             }                                
         }
 

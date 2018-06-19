@@ -10,10 +10,10 @@ namespace Raytracer
 {
     public class RenderEngine
     {
-        private const int SAMPLES_PER_PIXEL = 20*20; // 4
+        private const int SAMPLES_PER_PIXEL = 256; // 4
         private const int FRAME_COUNT = 1; // 30
         private const int MAX_TRACE_DEPTH = 10; // 10
-        private const bool USE_RANDOM_RAYS = true;
+        private const bool USE_RANDOM_RAYS = false;
         private const bool USE_THREADS = true;
         
         private readonly Random globalRandom = new Random();
